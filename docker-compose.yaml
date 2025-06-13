@@ -147,8 +147,8 @@ services:
       - "/etc/timezone:/etc/timezone:ro/"
       - "./config/nginx.conf:/etc/nginx/nginx.conf"
       - "./certs/dhparam.pem:/etc/nginx/certs/dhparam.pem" # Diffie Hellman
-      - "./certs/example.org.crt:/etc/nginx/certs/fullchain.pem" # Certificate generate by a CA
-      - "./certs/example.org.key:/etc/nginx/certs/privkey.pem" # Certificate generete by a CA
+      - "./certs/fullchain.pem:/etc/nginx/certs/fullchain.pem" # Certificate generate by a CA
+      - "./certs/privkey.pem:/etc/nginx/certs/privkey.pem" # Certificate generete by a CA
 #      - ./certs/certbot/conf:/etc/letsencrypt # Certificate generete by Letsencrypt script
 #      - ./certs/certbot/www:/var/www/certbot # Certificate generete by Letsencrypt script
     ports:
