@@ -1,0 +1,44 @@
+# This image will be published as dspace/dspace-angular:$DSPACE_VERSION-dist
+# See https://github.com/DSpace/dspace-angular/tree/main/docker for usage details
+
+# Test build:
+# docker build -f Dockerfile.dist -t dspace/dspace-angular:latest-dist .
+
+FROM docker.io/node:18-alpine AS build
+ENV NODE_OPTIONS="--max_old_space_size=4096"
+# Ensure Python and other build tools are available
+# These are needed to install some node modules, especially on linux/arm64
+#RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+#COPY package.json package-lock.json ./
+
+#ADD . /app/
+# Get source code
+ENV DSPACE_VERSION=9.0
+RUN wget https://github.com/DSpace/dspace-angular/archive/refs/tags/dspace-9.0.tar.gz \
+    && tar -xvzf dspace-$DSPACE_VERSION.tar.gz \
+    && rm -f dspace-$DSPACE_VERSION.tar.gz \
+    && mv dspace* dspace \
+    && mv dspace/* /app/
+
+RUN yarn add @popperjs/core react react-dom
+
+# Acrescentado a linha:
+RUN yarn install 
+
+RUN yarn build:prod
+
+FROM node:18-alpine
+ENV NODE_OPTIONS="--max_old_space_size=4096"
+RUN npm install --global pm2
+
+COPY --chown=node:node --from=build /app/dist /app/dist
+#COPY --chown=node:node config /app/config
+#COPY --chown=node:node docker/dspace-ui.json /app/dspace-ui.json
+
+WORKDIR /app
+USER node
+ENV NODE_ENV=production
+EXPOSE 4000
+CMD ["pm2-runtime", "start", "dspace-ui.json", "--json"]
