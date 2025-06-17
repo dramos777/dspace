@@ -53,6 +53,8 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+    restart: "on-failure"
+
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
@@ -73,6 +75,8 @@ services:
     volumes:
     # Keep Postgres data directory between reboots
     - pgdata:/pgdata
+    restart: "on-failure"
+
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
@@ -122,6 +126,7 @@ services:
       cp -r /opt/solr/server/solr/configsets/suggestion/* suggestion
       chown -R solr:solr /var/solr
       runuser -u solr -- solr-foreground
+    restart: "on-failure"
 
   dspace-angular:
     image: registry.example.org/dspace-angular:9.0
@@ -139,6 +144,7 @@ services:
         ipv4_address: 172.20.0.14
           #    ports:
           #      - "4000:4000"
+    restart: "on-failure"
 
   nginx:
     image: nginx:latest
